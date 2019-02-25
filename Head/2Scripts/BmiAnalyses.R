@@ -3,7 +3,7 @@
 
 rm(list=ls(all=TRUE))
 
-Bmi = read.table("/home/konstantinpopadin/BMI/Body/MainTable.txt", header = TRUE, sep = '\t')
+Bmi = read.table("../../Body/1Raw/MainTable.txt", header = TRUE, sep = '\t')
 Bmi$Sex = Bmi$Sex-1; table(Bmi$Sex) # make it Dummy: 0 - males, 1 - females
 Bmi$BmiRatio = Bmi$BMI2/Bmi$BMI1
 Bmi$mtDNARatio = Bmi$mtDNA2/Bmi$mtDNA1
@@ -47,11 +47,17 @@ wilcox.test(Bmi$mtDNA1,Bmi$mtDNA2, paired = TRUE)
 wilcox.test(Bmi[Bmi$Operation == 'LSG',]$mtDNA1,Bmi[Bmi$Operation == 'LSG',]$mtDNA2, paired = TRUE)  # 0.011
 wilcox.test(Bmi[Bmi$Operation == 'RYGB',]$mtDNA1,Bmi[Bmi$Operation == 'RYGB',]$mtDNA2, paired = TRUE)  # 0.0058
 
-### is there correlation between the strength of changes in BMI and strength of changes in mtDNA?
+######## pdf
+
+pdf("../../Body/4Figures/Bmi.mtDNA.pdf")
+
+### is there correlation between the strength of changes in BMI and strength of changes in mtDNA? mainly among females!!
 
 cor.test(Bmi$BMI2/Bmi$BMI1,Bmi$mtDNA2/Bmi$mtDNA1, method = 'spearman', alternative = 'less') 
 plot(Bmi$BMI2/Bmi$BMI1,Bmi$mtDNA2/Bmi$mtDNA1)
 
+cor.test(Bmi[Bmi$Sex == 1,]$BMI2/Bmi[Bmi$Sex == 1,]$BMI1,Bmi[Bmi$Sex == 1,]$mtDNA2/Bmi[Bmi$Sex == 1,]$mtDNA1, method = 'spearman', alternative = 'less')  # significant
+plot(Bmi[Bmi$Sex == 1,]$BMI2/Bmi[Bmi$Sex == 1,]$BMI1,Bmi[Bmi$Sex == 1,]$mtDNA2/Bmi[Bmi$Sex == 1,]$mtDNA1)
 
 ######## plot segments
 XMin = min(c(Bmi[!is.na(Bmi$mtDNA1),]$mtDNA1,Bmi[!is.na(Bmi$mtDNA2),]$mtDNA2))
@@ -86,6 +92,12 @@ boxplot(Bmi[!is.na(Bmi$mtDNARatio) & Bmi$Sex == 0,]$mtDNARatio,Bmi[!is.na(Bmi$mt
 abline(h = 1, col = 'red', lt = 2)
 
 
+# max in controls 
+MaxMtdnaControls = max(Bmi[Bmi$Operation == 'Controls',]$mtDNA1)
+MaxMtdnaControls
+boxplot(Bmi[!is.na(Bmi$mtDNARatio) & Bmi$Sex == 0,]$Age,Bmi[!is.na(Bmi$mtDNARatio) & Bmi$Sex == 1,]$Age, notch = TRUE, names = c('males','females'), ylab = 'Age')
+
+dev.off()
 
 
 
